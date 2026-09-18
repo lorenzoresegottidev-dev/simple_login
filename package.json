@@ -5,7 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest run",
+    "tests": "vitest run",
+    "test:unit": "vitest run unit_tests",
+    "test:integration": "vitest run integration_tests",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "next": "^15.5.25",
@@ -16,6 +21,12 @@
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.1",
+    "@playwright/test": "^1.55.0",
+    "jsdom": "^26.0.0",
+    "vitest": "^3.2.7"
   }
 }
