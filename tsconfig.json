@@ -18,6 +18,21 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "unit_tests/**/*.ts",
+    "unit_tests/**/*.tsx",
+    "integration_tests/**/*.ts",
+    "integration_tests/**/*.tsx",
+    "component_tests/**/*.ts",
+    "component_tests/**/*.tsx",
+    "e2e_tests/**/*.ts",
+    "e2e_tests/**/*.tsx",
+    "vitest.config.mts",
+    "playwright.config.ts",
+    ".next/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

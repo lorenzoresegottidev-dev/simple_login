@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   decideLogin,
   decideRegistration,
@@ -18,12 +18,8 @@ type UseAuthOptions = {
 const defaultGenerateId = () => crypto.randomUUID();
 
 export function useAuth({ storage = authStorage, generateId = defaultGenerateId }: UseAuthOptions = {}) {
-  const [currentUser, setCurrentUser] = useState<StoredUser | null>(null);
+  const [currentUser, setCurrentUser] = useState<StoredUser | null>(() => storage.readSession());
   const [message, setMessage] = useState<AuthMessage | null>(null);
-
-  useEffect(() => {
-    setCurrentUser(storage.readSession());
-  }, [storage]);
 
   const register = (input: RegisterInput): boolean => {
     const users = storage.readUsers();

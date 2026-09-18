@@ -6,10 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "tests": "vitest run",
-    "test:unit": "vitest run unit_tests",
+    "test:unit": "vitest run --project unit",
     "test:integration": "vitest run integration_tests",
+    "test:component": "vitest run component_tests",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -18,15 +20,18 @@
     "react-dom": "19.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
-    "@types/react": "^19.0.7",
-    "@types/react-dom": "^19.0.3",
-    "typescript": "^5.7.2",
+    "@eslint/eslintrc": "^3.3.7",
+    "@playwright/test": "^1.55.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.1",
-    "@playwright/test": "^1.55.0",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^15.5.25",
     "jsdom": "^26.0.0",
+    "typescript": "^5.7.2",
     "vitest": "^3.2.7"
   }
 }
