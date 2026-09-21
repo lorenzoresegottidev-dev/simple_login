@@ -14,6 +14,8 @@ export type AuthMessage = {
 export type AuthCode =
   | 'REGISTERED'
   | 'EMPTY_FIELDS'
+  | 'EMAIL_INVALID'
+  | 'PASSWORD_WEAK'
   | 'EMAIL_TAKEN'
   | 'LOGIN_SUCCESS'
   | 'INVALID_CREDENTIALS'
@@ -43,6 +45,9 @@ type LoginDecision = {
   message: AuthMessage;
 };
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordPattern = /^(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
 export function decideRegistration(
   input: RegisterInput,
   users: StoredUser[],
@@ -53,6 +58,14 @@ export function decideRegistration(
 
   if (!name || !email || !input.password.trim()) {
     return { user: null, message: { type: 'error', code: 'EMPTY_FIELDS' } };
+  }
+
+  if (!emailPattern.test(email)) {
+    return { user: null, message: { type: 'error', code: 'EMAIL_INVALID' } };
+  }
+
+  if (!passwordPattern.test(input.password)) {
+    return { user: null, message: { type: 'error', code: 'PASSWORD_WEAK' } };
   }
 
   if (users.some((user) => user.email.toLowerCase() === email)) {
@@ -77,6 +90,10 @@ export function decideLogin(input: LoginInput, users: StoredUser[]): LoginDecisi
 
   if (!email || !input.password.trim()) {
     return { user: null, message: { type: 'error', code: 'EMPTY_FIELDS' } };
+  }
+
+  if (!emailPattern.test(email) || !passwordPattern.test(input.password)) {
+    return { user: null, message: { type: 'error', code: 'INVALID_CREDENTIALS' } };
   }
 
   const user = users.find(

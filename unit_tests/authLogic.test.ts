@@ -5,13 +5,13 @@ const existingUser: StoredUser = {
   id: '1',
   name: 'Anna Bianchi',
   email: 'anna@email.com',
-  password: 'secret123',
+  password: 'Secret123!',
 };
 
 describe('auth decisions', () => {
   it('registers a valid user with normalized fields', () => {
     const decision = decideRegistration(
-      { name: ' Luca Verdi ', email: 'LUCA@EMAIL.COM ', password: 'password123' },
+      { name: ' Luca Verdi ', email: 'LUCA@EMAIL.COM ', password: 'Password123!' },
       [],
       '2',
     );
@@ -20,14 +20,14 @@ describe('auth decisions', () => {
       id: '2',
       name: 'Luca Verdi',
       email: 'luca@email.com',
-      password: 'password123',
+      password: 'Password123!',
     });
     expect(decision.message).toEqual({ type: 'success', code: 'REGISTERED', name: 'Luca Verdi' });
   });
 
   it('rejects a duplicate email case-insensitively', () => {
     const decision = decideRegistration(
-      { name: 'Nuovo utente', email: ' ANNA@EMAIL.COM ', password: 'password123' },
+      { name: 'Nuovo utente', email: ' ANNA@EMAIL.COM ', password: 'Password123!' },
       [existingUser],
       '2',
     );
@@ -37,7 +37,7 @@ describe('auth decisions', () => {
   });
 
   it('finds a matching user during login', () => {
-    const decision = decideLogin({ email: ' ANNA@EMAIL.COM ', password: 'secret123' }, [existingUser]);
+    const decision = decideLogin({ email: ' ANNA@EMAIL.COM ', password: 'Secret123!' }, [existingUser]);
 
     expect(decision.user).toEqual(existingUser);
     expect(decision.message).toEqual({ type: 'success', code: 'LOGIN_SUCCESS', name: 'Anna Bianchi' });
@@ -48,6 +48,28 @@ describe('auth decisions', () => {
 
     expect(decision.user).toBeNull();
     expect(decision.message.code).toBe('INVALID_CREDENTIALS');
+  });
+
+  it('rejects an invalid email during registration', () => {
+    const decision = decideRegistration(
+      { name: 'Luca', email: 'xsfgvbh', password: 'Password123!' },
+      [],
+      '2',
+    );
+
+    expect(decision.user).toBeNull();
+    expect(decision.message.code).toBe('EMAIL_INVALID');
+  });
+
+  it.each(['short1!', 'Password!', 'Password123'])('rejects a weak password: %s', (password) => {
+    const decision = decideRegistration(
+      { name: 'Luca', email: 'luca@email.com', password },
+      [],
+      '2',
+    );
+
+    expect(decision.user).toBeNull();
+    expect(decision.message.code).toBe('PASSWORD_WEAK');
   });
 
   it('returns the logged-out state', () => {

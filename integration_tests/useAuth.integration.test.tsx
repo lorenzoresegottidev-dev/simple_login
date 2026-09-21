@@ -38,12 +38,12 @@ describe('useAuth orchestration', () => {
     const { result } = renderHook(() => useAuth({ storage: memoryStorage, generateId: () => 'fixed-id' }));
 
     act(() => {
-      expect(result.current.register({ name: 'Luca', email: 'luca@email.com', password: 'secret' })).toBe(true);
+      expect(result.current.register({ name: 'Luca', email: 'luca@email.com', password: 'Secret123!' })).toBe(true);
     });
     expect(result.current.message).toEqual({ type: 'success', code: 'REGISTERED', name: 'Luca' });
 
     act(() => {
-      expect(result.current.login({ email: 'luca@email.com', password: 'secret' })).toBe(true);
+      expect(result.current.login({ email: 'luca@email.com', password: 'Secret123!' })).toBe(true);
     });
     expect(result.current.currentUser?.id).toBe('fixed-id');
 
@@ -59,7 +59,7 @@ describe('useAuth orchestration', () => {
     const { result } = renderHook(() => useAuth({ storage: memoryStorage, generateId: () => 'fixed-id' }));
 
     act(() => {
-      expect(result.current.register({ name: 'Luca', email: 'luca@email.com', password: 'secret' })).toBe(false);
+      expect(result.current.register({ name: 'Luca', email: 'luca@email.com', password: 'Secret123!' })).toBe(false);
     });
 
     expect(result.current.currentUser).toBeNull();
@@ -74,7 +74,7 @@ describe('useAuth orchestration', () => {
       id: 'existing-id',
       name: 'Anna',
       email: 'anna@email.com',
-      password: 'secret',
+      password: 'Secret123!',
     };
     const memoryStorage = createMemoryStorage([existingUser]);
     memoryStorage.writeSession(existingUser);

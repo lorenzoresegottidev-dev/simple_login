@@ -10,13 +10,13 @@ test.beforeEach(async ({ page }) => {
 async function registerUser(page: Page) {
   await page.getByPlaceholder('Mario Rossi').fill('Luca Verdi');
   await page.getByPlaceholder('mario@email.com').nth(0).fill('luca@email.com');
-  await page.getByPlaceholder('••••••••').nth(0).fill('password123');
+  await page.getByPlaceholder('••••••••').nth(0).fill('Password123!');
   await page.getByRole('button', { name: 'Registrami' }).click();
 
   await expect(page.getByText('Utente Luca Verdi registrato con successo.')).toBeVisible();
 }
 
-async function loginUser(page: Page, password = 'password123') {
+async function loginUser(page: Page, password = 'Password123!') {
   await page.getByPlaceholder('mario@email.com').nth(1).fill('luca@email.com');
   await page.getByPlaceholder('••••••••').nth(1).fill(password);
   await page.getByRole('button', { name: 'Entra' }).click();
@@ -32,7 +32,7 @@ test('esegue il login con credenziali corrette', async ({ page }) => {
 
 test('rifiuta credenziali errate', async ({ page }) => {
   await registerUser(page);
-  await loginUser(page, 'password-sbagliata');
+  await loginUser(page, 'WrongPass1!');
 
   await expect(page.getByText('Credenziali non valide.')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Accedi' })).toBeVisible();

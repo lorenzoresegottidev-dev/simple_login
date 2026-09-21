@@ -26,8 +26,8 @@ describe('auth presentational components', () => {
 
     render(
       <>
-        <RegisterForm value={{ name: '', email: '', password: '' }} onChange={onRegisterChange} onSubmit={onRegisterSubmit} />
-        <LoginForm value={{ email: '', password: '' }} onChange={onLoginChange} onSubmit={onLoginSubmit} />
+        <RegisterForm value={{ name: 'Luca', email: 'luca@email.com', password: 'Secret123!' }} onChange={onRegisterChange} onSubmit={onRegisterSubmit} />
+        <LoginForm value={{ email: 'luca@email.com', password: 'Secret123!' }} onChange={onLoginChange} onSubmit={onLoginSubmit} />
       </>,
     );
 
@@ -50,7 +50,7 @@ describe('auth presentational components', () => {
 
     render(
       <SessionCard
-        user={{ id: '1', name: 'Anna', email: 'anna@email.com', password: 'secret' }}
+        user={{ id: '1', name: 'Anna', email: 'anna@email.com', password: 'Secret123!' }}
         onLogout={onLogout}
       />,
     );
@@ -73,7 +73,7 @@ describe('SimpleUserAuth form reset', () => {
     const name = within(registerForm).getByPlaceholderText('Mario Rossi');
     await user.type(name, 'Luca');
     await user.type(within(registerForm).getByPlaceholderText('mario@email.com'), 'luca@email.com');
-    await user.type(within(registerForm).getByPlaceholderText('••••••••'), 'secret');
+    await user.type(within(registerForm).getByPlaceholderText('••••••••'), 'Secret123!');
     await user.click(within(registerForm).getByRole('button', { name: 'Registrami' }));
 
     expect((name as HTMLInputElement).value).toBe('');
@@ -94,7 +94,7 @@ describe('SimpleUserAuth form reset', () => {
       const name = within(registerForm).getByPlaceholderText('Mario Rossi');
       await user.type(name, 'Luca');
       await user.type(within(registerForm).getByPlaceholderText('mario@email.com'), 'luca@email.com');
-      await user.type(within(registerForm).getByPlaceholderText('••••••••'), 'secret');
+      await user.type(within(registerForm).getByPlaceholderText('••••••••'), 'Secret123!');
       await user.click(within(registerForm).getByRole('button', { name: 'Registrami' }));
 
       expect((name as HTMLInputElement).value).toBe('Luca');

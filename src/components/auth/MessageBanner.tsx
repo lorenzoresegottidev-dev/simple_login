@@ -8,6 +8,8 @@ type MessageBannerProps = {
 const messageText: Record<AuthCode, (message: AuthMessage) => string> = {
   REGISTERED: ({ name }) => `Utente ${name} registrato con successo.`,
   EMPTY_FIELDS: () => 'Completa tutti i campi.',
+  EMAIL_INVALID: () => 'Inserisci un indirizzo email valido.',
+  PASSWORD_WEAK: () => 'La password deve avere almeno 8 caratteri, un numero e un carattere speciale.',
   EMAIL_TAKEN: () => 'Questo utente è già registrato.',
   LOGIN_SUCCESS: ({ name }) => `Bentornato, ${name}.`,
   INVALID_CREDENTIALS: () => 'Credenziali non valide.',
