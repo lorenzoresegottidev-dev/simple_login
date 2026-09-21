@@ -1,8 +1,8 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import type { StoredUser } from '../src/lib/auth/authLogic';
-import { useAuth } from '../src/lib/auth/useAuth';
-import type { AuthStorage } from '../src/lib/auth/storage';
+import type { StoredUser } from '../../src/lib/auth/authLogic';
+import { useAuth } from '../../src/lib/auth/useAuth';
+import type { AuthStorage } from '../../src/lib/auth/storage';
 
 function createMemoryStorage(initialUsers: StoredUser[] = []): AuthStorage & { failWrites: boolean } {
   let users = initialUsers;

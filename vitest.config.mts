@@ -6,15 +6,22 @@ export default defineConfig({
       {
         test: {
           name: 'unit',
-          include: ['unit_tests/**/*.test.ts'],
+          include: ['tests/unit_tests/**/*.test.ts'],
           environment: 'node',
         },
       },
       {
         test: {
           name: 'browser-integration',
-          include: ['integration_tests/**/*.test.ts?(x)', 'component_tests/**/*.test.ts?(x)'],
+          include: ['tests/integration_tests/**/*.test.ts?(x)', 'tests/component_tests/**/*.test.ts?(x)'],
           environment: 'jsdom',
+        },
+      },
+      {
+        test: {
+          name: 'api',
+          include: ['tests/api_tests/**/*.test.ts'],
+          environment: 'node',
         },
       },
     ],

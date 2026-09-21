@@ -10,9 +10,12 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
-    "test:integration": "vitest run integration_tests",
-    "test:component": "vitest run component_tests",
-    "test:e2e": "playwright test"
+    "test:integration": "vitest run tests/integration_tests",
+    "test:component": "vitest run tests/component_tests",
+    "test:api": "vitest run --project api",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test --config=playwright.a11y.config.ts",
+    "test:performance": "k6 run tests/performance_tests/auth-load.js"
   },
   "dependencies": {
     "next": "^15.5.25",
@@ -20,6 +23,7 @@
     "react-dom": "19.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/eslintrc": "^3.3.7",
     "@playwright/test": "^1.55.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -28,9 +32,11 @@
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
+    "@types/supertest": "^7.2.1",
     "eslint": "^9.39.5",
     "eslint-config-next": "^15.5.25",
     "jsdom": "^26.0.0",
+    "supertest": "^7.2.2",
     "typescript": "^5.7.2",
     "vitest": "^3.2.7"
   }

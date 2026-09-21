@@ -2,11 +2,11 @@ import React from 'react';
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { LoginForm } from '../src/components/auth/LoginForm';
-import { MessageBanner } from '../src/components/auth/MessageBanner';
-import { RegisterForm } from '../src/components/auth/RegisterForm';
-import { SessionCard } from '../src/components/auth/SessionCard';
-import { SimpleUserAuth } from '../src/components/auth/SimpleUserAuth';
+import { LoginForm } from '../../src/components/auth/LoginForm';
+import { MessageBanner } from '../../src/components/auth/MessageBanner';
+import { RegisterForm } from '../../src/components/auth/RegisterForm';
+import { SessionCard } from '../../src/components/auth/SessionCard';
+import { SimpleUserAuth } from '../../src/components/auth/SimpleUserAuth';
 
 afterEach(() => cleanup());
 

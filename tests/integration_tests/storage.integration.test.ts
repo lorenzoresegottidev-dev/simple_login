@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { authStorage } from '../src/lib/auth/storage';
+import { authStorage } from '../../src/lib/auth/storage';
 
 describe('authStorage browser integration', () => {
   beforeEach(() => {
