@@ -1,168 +1,174 @@
 # simple_login — come è fatta l'app e come viene verificata
 
-> Fotografia dello stato attuale — 18 settembre 2026
-> 9 file per la funzione di accesso · 20 verifiche automatiche su 4 livelli
+> Stato al 18 settembre 2026 — 9 file per la funzione di accesso, 20 verifiche automatiche su 4 livelli
 
 ---
 
 ## 1. Cosa fa l'app
 
-Una pagina dove una persona può **registrarsi**, **accedere** con le proprie credenziali e **uscire**. Chi ha effettuato l'accesso resta riconosciuto anche se ricarica la pagina o chiude e riapre il browser: i dati vengono conservati nella memoria del browser stesso, non su un server.
+Una pagina dove una persona può **registrarsi**, **accedere** e **uscire**. Chi ha effettuato l'accesso resta riconosciuto anche dopo aver ricaricato la pagina: i dati sono conservati nella memoria del browser, non su un server.
 
 ---
 
-## 2. Le quattro squadre
-
-L'app è divisa in quattro gruppi di file, ognuno con un compito che gli altri non svolgono. È la stessa divisione di uno sportello:
+## 2. Com'è divisa
 
 ```
-┌───────────────────────────────────────────────────────────────┐
-│                                                               │
-│   IL BANCONE            Quello che la persona vede e tocca:   │
-│   4 file                moduli da compilare, pulsanti,        │
-│                         messaggi, riquadro della sessione     │
-│                                                               │
-│   ──────────────────────────────────────────────────────────  │
-│                                                               │
-│   IL COORDINATORE       Riceve la richiesta dal bancone,      │
-│   1 file                consulta il regolamento, ordina       │
-│                         all'archivio di scrivere, riferisce   │
-│                                                               │
-│   ──────────────────────────────────────────────────────────  │
-│                                                               │
-│   IL REGOLAMENTO        Le regole di accesso: cosa è valido,  │
-│   1 file                chi esiste già, quali credenziali     │
-│                         corrispondono. Solo giudizi.          │
-│                                                               │
-│   ──────────────────────────────────────────────────────────  │
-│                                                               │
-│   L'ARCHIVIO            L'unico che apre il cassetto dove i   │
-│   1 file                dati sono conservati, e l'unico che   │
-│                         sa cosa fare se il cassetto è rotto   │
-│                                                               │
-└───────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│  INTERFACCIA — 4 file                                            │
+│  Moduli, pulsanti, messaggi, riquadro della sessione.            │
+│  Non decide e non salva.                                         │
+├──────────────────────────────────────────────────────────────────┤
+│  GESTIONE DELLE OPERAZIONI — 1 file                              │
+│  Esegue la sequenza: recupera i dati, fa valutare la richiesta,  │
+│  fa salvare, comunica l'esito.                                   │
+├──────────────────────────────────────────────────────────────────┤
+│  REGOLE DI ACCESSO — 1 file                                      │
+│  Stabilisce cosa è valido. Solo valutazioni, nessun dato letto   │
+│  o scritto.                                                      │
+├──────────────────────────────────────────────────────────────────┤
+│  SALVATAGGIO DEI DATI — 1 file                                   │
+│  L'unico che accede alla memoria del browser, e l'unico che sa   │
+│  cosa fare se è illeggibile o piena.                             │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-Due principi reggono tutta l'organizzazione:
+Due principi reggono la divisione:
 
-**Chi giudica non tocca i dati.** Il regolamento non apre mai il cassetto: riceve l'elenco delle persone registrate e dice se la richiesta è accettabile. Nient'altro.
-
-**Chi tocca i dati non giudica.** L'archivio non sa cosa sia una password sbagliata: sa solo leggere, scrivere e riferire se ci è riuscito.
+- **Le regole non leggono né scrivono dati.** Ricevono l'elenco delle persone registrate già pronto e stabiliscono solo se la richiesta è accettabile.
+- **Il salvataggio non valuta nulla.** Non sa cosa sia una password sbagliata: legge, scrive e riferisce se ci è riuscito.
 
 ---
 
-## 3. Cosa succede quando qualcuno si registra
+## 3. Cosa succede durante una registrazione
 
 ```
    La persona compila i campi e preme "Registrami"
                     │
-                    ▼
-   ① IL BANCONE non decide nulla: passa i tre valori al coordinatore
+   ① L'INTERFACCIA passa i tre valori alla gestione
                     │
-                    ▼
-   ② IL COORDINATORE chiede all'archivio l'elenco dei registrati
+   ② LA GESTIONE recupera l'elenco delle persone registrate
                     │
-                    ▼
-   ③ IL REGOLAMENTO esamina: campi compilati? email già presente?
+   ③ LE REGOLE valutano: campi compilati? email già presente?
                     │
           ┌─────────┴─────────┐
           ▼                   ▼
-     richiesta             richiesta
-     respinta              accettata
+      respinta            accettata
           │                   │
-          │                   ▼
-          │         ④ L'ARCHIVIO prova a scrivere
-          │                   │
-          │         ┌─────────┴─────────┐
-          │         ▼                   ▼
-          │     non riesce           riesce
-          │         │                   │
-          ▼         ▼                   ▼
-    ┌──────────────────────────────────────────┐
-    │  ⑤ IL BANCONE mostra l'esito              │
-    │     • respinta → i campi restano pieni    │
-    │     • fallita  → i campi restano pieni    │
-    │     • riuscita → i campi si svuotano      │
-    └──────────────────────────────────────────┘
+          │         ④ IL SALVATAGGIO prova a scrivere
+          │             ┌─────┴─────┐
+          │             ▼           ▼
+          │         non riesce    riesce
+          ▼             ▼           ▼
+    ┌───────────────────────────────────────────┐
+    │  ⑤ L'INTERFACCIA mostra l'esito            │
+    │     respinta o fallita → campi pieni       │
+    │     riuscita           → campi svuotati    │
+    └───────────────────────────────────────────┘
 ```
 
-Il dettaglio del punto ⑤ non è un vezzo: se il salvataggio fallisce (memoria del browser piena, navigazione anonima), l'app **non** cancella quanto la persona ha scritto e **non** dichiara un successo che non c'è stato.
+Il punto ⑤ non è estetico: se il salvataggio fallisce — memoria piena, navigazione anonima — l'app non cancella quanto è stato digitato e non dichiara un successo che non c'è stato.
 
 ---
 
 ## 4. Le parti, una per una
 
-### Il bancone — `src/components/auth/`
+### Interfaccia — `src/components/auth/`
 
 | File | Cosa mostra |
 |---|---|
-| `SimpleUserAuth` | La pagina intera: intestazione, messaggi, e — a seconda che ci sia o no un accesso attivo — i due moduli oppure il riquadro della sessione. Non prende nessuna decisione: raccoglie quello che la persona scrive e chiede al coordinatore di occuparsene |
-| `RegisterForm` | Il modulo di registrazione: nome, email, password, pulsante. Non sa cosa succederà quando viene premuto |
-| `LoginForm` | Il modulo di accesso: email, password, pulsante |
-| `SessionCard` | Il riquadro «Ciao, Anna» con l'email e il pulsante di uscita |
-| `MessageBanner` | La striscia colorata con l'esito. **È l'unico posto dell'app dove sono scritte le frasi in italiano** — verde per i successi, rossa per gli errori, azzurra per le informazioni |
+| `SimpleUserAuth` | La pagina completa. Raccoglie ciò che viene digitato e inoltra le richieste |
+| `RegisterForm` | Modulo di registrazione: nome, email, password |
+| `LoginForm` | Modulo di accesso: email, password |
+| `SessionCard` | Riquadro «Ciao, Anna» con email e pulsante di uscita |
+| `MessageBanner` | Striscia colorata con l'esito |
 
-L'ultima riga merita attenzione: il regolamento non emette frasi, emette **etichette** (`EMAIL_TAKEN`, `INVALID_CREDENTIALS`). La traduzione in *«Questo utente è già registrato.»* avviene solo qui. Cambiare le parole dell'interfaccia — o aggiungere una seconda lingua — è un intervento su un file solo, e non tocca alcuna regola.
+`MessageBanner` è **l'unico punto in cui sono scritte le frasi in italiano**. Le regole non producono frasi ma etichette (`EMAIL_TAKEN`, `INVALID_CREDENTIALS`), tradotte soltanto qui.
 
-### Il coordinatore — `src/lib/auth/useAuth.ts`
+### Gestione delle operazioni — `src/lib/auth/useAuth.ts`
 
-Mette a disposizione del bancone quattro cose: **chi ha l'accesso attivo**, **l'ultimo messaggio da mostrare**, e le tre operazioni **registrati / accedi / esci**.
+Mette a disposizione dell'interfaccia: **chi ha l'accesso attivo**, **l'ultimo messaggio**, e le operazioni **registrazione / accesso / uscita**.
 
 | Operazione | Sequenza |
 |---|---|
-| `register` | chiede l'elenco → fa valutare la richiesta → se accettata fa scrivere → se la scrittura fallisce lo dichiara |
-| `login` | chiede l'elenco → fa verificare le credenziali → apre la sessione → segnala chi è entrato |
-| `logout` | fa chiudere la sessione → azzera chi è entrato |
-| all'apertura | chiede all'archivio se c'era già una sessione aperta, e in tal caso riconosce subito la persona |
+| Registrazione | recupera l'elenco → fa valutare → se accettata fa salvare → se il salvataggio fallisce lo dichiara |
+| Accesso | recupera l'elenco → fa verificare le credenziali → apre la sessione |
+| Uscita | chiude la sessione |
+| All'apertura | se esiste già una sessione, riconosce subito la persona |
 
-Ogni operazione risponde al bancone **riuscita / non riuscita**: è così che il bancone sa se può svuotare i campi.
+Ogni operazione risponde **riuscita** o **non riuscita**: è così che l'interfaccia sa se può svuotare i campi. E funziona con **qualunque sistema di salvataggio**, purché sappia leggere e scrivere — dettaglio da cui dipende metà della strategia di verifica.
 
-Una particolarità voluta: il coordinatore accetta di lavorare con **un archivio qualsiasi**, purché sappia leggere e scrivere. Nell'app vero è quello del browser; nelle verifiche è un archivio finto, che si può far fallire a comando. È il motivo per cui il caso «il salvataggio non riesce» è verificabile senza dover riempire davvero la memoria di un browser.
-
-### Il regolamento — `src/lib/auth/authLogic.ts`
+### Regole di accesso — `src/lib/auth/authLogic.ts`
 
 | Regola | Cosa stabilisce |
 |---|---|
-| `decideRegistration` | I campi devono essere compilati. Spazi iniziali e finali vengono ignorati, l'email viene ricondotta a lettere minuscole. Se quell'email risulta già registrata, la richiesta è respinta. Altrimenti la nuova persona viene composta e restituita |
-| `decideLogin` | Stessa pulizia di email e spazi. Cerca una corrispondenza esatta fra email e password nell'elenco ricevuto. Se non la trova, credenziali non valide |
-| `logoutDecision` | Lo stato di «uscita effettuata». Non è un calcolo, è semplicemente il risultato che si ottiene sempre |
+| `decideRegistration` | Campi compilati; spazi ignorati ed email ricondotta a minuscole; se l'email risulta già presente la richiesta è respinta |
+| `decideLogin` | Stessa pulizia; cerca nell'elenco ricevuto la corrispondenza fra email e password |
+| `logoutDecision` | L'esito dell'uscita, sempre identico |
 
-Conseguenza pratica delle due righe sulla pulizia: `Anna@Email.com` e ` anna@email.com ` sono **la stessa persona**, sia in registrazione sia in accesso. È la regola più facile da rompere per sbaglio, ed è quella verificata per prima.
+Conseguenza pratica: `Anna@Email.com` e ` anna@email.com ` sono **la stessa persona**.
 
-### L'archivio — `src/lib/auth/storage.ts`
+### Salvataggio dei dati — `src/lib/auth/storage.ts`
 
-| Operazione | Cosa fa | Se qualcosa va storto |
-|---|---|---|
-| `readUsers` | Legge l'elenco dei registrati | Restituisce un elenco vuoto |
-| `writeUsers` | Salva l'elenco aggiornato | Dichiara di non esserci riuscito |
-| `readSession` | Legge chi ha l'accesso attivo | Restituisce «nessuno» |
-| `writeSession` | Apre la sessione | Dichiara di non esserci riuscito |
-| `clearSession` | Chiude la sessione | Dichiara di non esserci riuscito |
-
-Tutto ciò che riguarda il cassetto dei dati è raccolto qui, comprese le protezioni: se il contenuto risultasse illeggibile — danneggiato, scritto da una versione precedente dell'app, alterato da un'estensione del browser — l'archivio riparte da un elenco vuoto invece di far bloccare la pagina. Ed è l'unico file dell'app in cui una protezione del genere serva, perché è l'unico che apre il cassetto.
-
----
-
-## 5. Perché è organizzato così
-
-Perché ogni pezzo possa essere messo alla prova **da solo**, senza trascinarsi dietro tutto il resto.
-
-| Per verificare… | Serve… |
+| Operazione | In caso di problema |
 |---|---|
-| che due email uguali a meno di maiuscole siano la stessa persona | solo il regolamento, con un elenco scritto a mano |
-| che il fallimento di un salvataggio non cancelli i dati digitati | il coordinatore e un archivio finto che rifiuta di scrivere |
-| che un contenuto illeggibile non blocchi la pagina | solo l'archivio |
-| che una persona riesca davvero ad accedere | l'app intera, in un browser vero |
+| `readUsers` — legge l'elenco | elenco vuoto |
+| `writeUsers` — salva l'elenco | dichiara di non esserci riuscito |
+| `readSession` — legge chi è collegato | «nessuno» |
+| `writeSession` — apre la sessione | dichiara di non esserci riuscito |
+| `clearSession` — chiude la sessione | dichiara di non esserci riuscito |
 
-Con tutto raccolto in un unico file — come era all'inizio — ognuna di queste verifiche avrebbe richiesto di aprire la pagina, compilare i moduli e premere i pulsanti. Le prime tre sarebbero costate cento volte tanto, e alcune sarebbero state di fatto impossibili.
+Se il contenuto salvato è illeggibile — danneggiato, scritto da una versione precedente, alterato da un'estensione — l'app riparte da un elenco vuoto invece di bloccarsi.
 
 ---
 
-## 6. I quattro livelli di verifica
+## 5. Come sono fatte le verifiche
+
+Il principio è **sostituire con qualcosa di finto tutto ciò che non si sta verificando in quel momento.** Meno cose vere ci sono attorno, più la prova è veloce e più il fallimento indica con precisione il colpevole.
+
+| Livello | L'app è… | I dati sono… | Il salvataggio è… | La pagina è… |
+|---|---|---|---|---|
+| **Regole** | tre funzioni | scritti nel test | assente | assente |
+| **Collaborazione** | una parte sola | scritti nel test | finto, in memoria | simulata |
+| **Schermo** | interfaccia | scritti nel test | finto o simulato | simulata |
+| **Browser** | tutta, avviata davvero | digitati | vero | vera |
+
+### Regole — dati scritti a mano
+
+Alle funzioni si passa direttamente un elenco di persone registrate, scritto nel test:
+
+```
+elenco = [ { nome: "Anna Bianchi", email: "anna@email.com", password: "secret123" } ]
+```
+
+Nessuna memoria del browser, nessun archivio, nessuna pagina: il test chiama la funzione con quei dati e controlla la risposta. **Non esiste una banca dati da preparare o da ripulire** — è per questo che ognuna di queste prove dura millesimi di secondo e non può fallire per cause esterne.
+
+Le prove a questo livello girano in un ambiente **privo di qualunque pagina web**: se del codice di interfaccia finisse per errore nel file delle regole, smetterebbero subito di funzionare.
+
+### Collaborazione — salvataggio finto, con interruttore
+
+Qui si verifica che le parti lavorino insieme. Al posto della memoria del browser si usa un **salvataggio finto** che tiene tutto in una variabile: si comporta come quello vero — si può scrivere, rileggere, cancellare — ma vive solo per la durata della prova.
+
+Ha in più un interruttore: **«rifiuta di scrivere»**. Accendendolo si riproduce in una riga la situazione «memoria piena o navigazione anonima», che con il salvataggio vero sarebbe quasi impossibile provocare a comando. È così che si verifica che un fallimento venga dichiarato invece di essere ignorato.
+
+Tre prove di questo gruppo usano invece il **salvataggio vero**, appoggiato a una riproduzione della memoria del browser che funziona nel terminale. Servono a controllare proprio ciò che il finto non può avere: contenuti danneggiati e scritture rifiutate.
+
+### Schermo — pagina simulata
+
+La pagina viene disegnata in una riproduzione del browser che vive nel terminale: niente finestre, niente attesa di caricamento. Le prove digitano nei campi e premono i pulsanti come farebbe una persona, poi controllano cosa compare.
+
+Ai moduli vengono passate **funzioni finte** al posto di quelle vere: non fanno nulla, si limitano a registrare di essere state chiamate. Basta questo per verificare che un modulo riferisca correttamente ciò che accade, **senza che nulla venga realmente salvato**.
+
+### Browser — tutto vero
+
+L'app viene costruita e avviata per davvero, e un Chrome reale la usa: digita, preme, ricarica la pagina. Nessuna sostituzione, nessuna finzione. È il livello più lento e quello che più somiglia all'uso reale.
+
+---
+
+## 6. I quattro livelli
 
 ```
                         ╱╲
-                       ╱  ╲       BROWSER VERO — 4 prove
+                       ╱  ╲       BROWSER — 4 prove
                       ╱────╲      « la persona ci riesce? »
                      ╱      ╲     lente, realistiche
                     ╱ SCHERMO╲
@@ -170,77 +176,73 @@ Con tutto raccolto in un unico file — come era all'inizio — ognuna di queste
                   ╱────────────╲  « l'interfaccia mostra e reagisce? »
                  ╱ COLLABORAZIONE╲
                 ╱                 ╲ COLLABORAZIONE — 6 prove
-               ╱───────────────────╲« i pezzi lavorano insieme? »
+               ╱───────────────────╲« le parti lavorano insieme? »
               ╱       REGOLE        ╲
              ╱_______________________╲REGOLE — 5 prove
-                                       « il giudizio è corretto? »
+                                       « la valutazione è corretta? »
                                        istantanee, precisissime
 
      veloci e mirate  ◄──────────────────────►  lente e complete
 ```
 
-Più si scende, più le prove sono rapide e indicano con precisione **dove** è il problema. Più si sale, più somigliano a quello che farebbe una persona vera, ma quando falliscono dicono soltanto **che** qualcosa non va.
+Più si scende, più le prove sono rapide e dicono con precisione **dove** è il problema. Più si sale, più somigliano all'uso reale, ma quando falliscono segnalano soltanto **che** qualcosa non funziona.
 
 La regola che tiene in equilibrio la piramide: **ogni caso si verifica una volta sola, al livello più basso capace di verificarlo.** Per questo «campi vuoti» ed «email già registrata» stanno fra le regole e non vengono ripetuti nel browser.
-
-Nota organizzativa: le prove sulle regole girano in un ambiente che **non ha nessuna pagina web a disposizione**. È una precauzione voluta — se qualcuno mescolasse per errore del codice di interfaccia dentro il regolamento, quelle prove smetterebbero di funzionare all'istante.
 
 ---
 
 ## 7. Le 20 verifiche
 
-### Livello REGOLE — 5 prove · `unit_tests/`
+### REGOLE — 5 prove · `unit_tests/`
 
 | # | Verifica |
 |---|---|
-| 1 | Registrando ` Luca Verdi ` con `LUCA@EMAIL.COM `, spazi ed maiuscole vengono ripuliti e la persona è creata correttamente |
-| 2 | Chi prova a registrarsi con un'email già presente, scritta in maiuscolo e con spazi, viene riconosciuto come già registrato |
+| 1 | Registrando ` Luca Verdi ` con `LUCA@EMAIL.COM `, spazi e maiuscole vengono ripuliti |
+| 2 | Chi si registra con un'email già presente, scritta in maiuscolo e con spazi, è riconosciuto come già registrato |
 | 3 | Chi accede scrivendo l'email in maiuscolo viene comunque riconosciuto |
-| 4 | Email giusta ma password sbagliata → credenziali non valide |
-| 5 | Lo stato di uscita riporta «nessuno collegato» e il messaggio di disconnessione |
+| 4 | Email corretta ma password sbagliata → credenziali non valide |
+| 5 | L'esito dell'uscita riporta «nessuno collegato» e il messaggio di disconnessione |
 
-### Livello COLLABORAZIONE — 6 prove · `integration_tests/`
+### COLLABORAZIONE — 6 prove · `integration_tests/`
 
-**Coordinatore con archivio finto (3)**
-
-| # | Verifica |
-|---|---|
-| 6 | Il ciclo completo registrazione → accesso → uscita funziona, e a ogni passo la persona riconosciuta è quella giusta |
-| 7 | Se l'archivio rifiuta di scrivere, la registrazione viene dichiarata fallita, nessuno risulta collegato e compare il messaggio d'errore |
-| 8 | Se all'apertura esiste già una sessione, la persona viene riconosciuta immediatamente, senza dover accedere di nuovo |
-
-**Archivio vero, con la memoria del browser (3)**
+**Con salvataggio finto (3)**
 
 | # | Verifica |
 |---|---|
-| 9 | Se il contenuto salvato è illeggibile, l'archivio restituisce un elenco vuoto invece di far bloccare la pagina |
-| 10 | Se non c'è mai stato niente di salvato, restituisce elenco vuoto e nessuna sessione |
-| 11 | Se il salvataggio viene rifiutato (memoria piena), l'archivio lo dichiara invece di fingere che sia andato bene |
+| 6 | Il ciclo registrazione → accesso → uscita funziona, e a ogni passo la persona riconosciuta è quella giusta |
+| 7 | Con l'interruttore «rifiuta di scrivere» acceso, la registrazione risulta fallita e compare il messaggio d'errore |
+| 8 | Se all'apertura esiste già una sessione, la persona è riconosciuta senza dover accedere di nuovo |
 
-La prova 9 è quella che il finto archivio non potrebbe mai fare: un archivio finto non può avere dati corrotti.
-
-### Livello SCHERMO — 5 prove · `component_tests/`
+**Con salvataggio vero (3)**
 
 | # | Verifica |
 |---|---|
-| 12 | L'etichetta `INVALID_CREDENTIALS` viene mostrata come *«Credenziali non valide.»* |
-| 13 | I due moduli riferiscono correttamente ciò che viene digitato e il momento in cui si preme il pulsante |
-| 14 | Il riquadro della sessione mostra il nome e riferisce la richiesta di uscita |
+| 9 | Contenuto salvato illeggibile → si riparte da un elenco vuoto invece di bloccare la pagina |
+| 10 | Nulla di salvato → elenco vuoto e nessuna sessione |
+| 11 | Scrittura rifiutata → il fallimento viene dichiarato invece di essere ignorato |
+
+### SCHERMO — 5 prove · `component_tests/`
+
+| # | Verifica |
+|---|---|
+| 12 | L'etichetta `INVALID_CREDENTIALS` compare come *«Credenziali non valide.»* |
+| 13 | I due moduli riferiscono ciò che viene digitato e il momento in cui si preme il pulsante |
+| 14 | Il riquadro della sessione mostra il nome e inoltra la richiesta di uscita |
 | 15 | Dopo una registrazione riuscita i campi si svuotano |
-| 16 | Se il salvataggio fallisce i campi **restano compilati** e compare il messaggio d'errore |
+| 16 | Se il salvataggio fallisce i campi **restano compilati** e compare l'errore |
 
-Le prove 15 e 16 sono una coppia: insieme dimostrano che l'app distingue fra «fatto» e «creduto fatto».
+Le prove 15 e 16 vanno lette insieme: dimostrano che l'app distingue un'operazione riuscita da una che sembra riuscita.
 
-### Livello BROWSER VERO — 4 prove · `e2e_tests/`
+### BROWSER — 4 prove · `e2e_tests/`
 
 | # | Verifica |
 |---|---|
-| 17 | Una persona si registra, accede, e vede il proprio nome ed email |
-| 18 | Con la password sbagliata compare l'errore e il modulo di accesso resta disponibile |
+| 17 | Una persona si registra, accede e vede il proprio nome ed email |
+| 18 | Password sbagliata → errore, e il modulo di accesso resta disponibile |
 | 19 | Dopo aver ricaricato la pagina, la persona è **ancora collegata** |
 | 20 | Premendo «Logout» compare la conferma e si torna ai moduli |
 
-La 19 è la ragione d'essere di questo livello: è l'unica prova dell'intera serie che spegne e riaccende davvero la pagina.
+La 19 è la ragione d'essere di questo livello: è l'unica prova che ricarica davvero la pagina.
 
 ---
 
@@ -253,20 +255,5 @@ La prova ha bisogno di vedere la pagina disegnata?
 │          └── SÌ ──► COLLABORAZIONE
 └── SÌ ──► serve un browser autentico?
            ├── NO ──► SCHERMO
-           └── SÌ ──► BROWSER VERO
+           └── SÌ ──► BROWSER
 ```
-
----
-
-## 9. Cosa manca ancora
-
-Nessuno di questi punti riguarda l'organizzazione dell'app: sono strumenti di supporto e automazione.
-
-- [ ] I file di verifica non vengono controllati dal controllo automatico dei tipi
-- [ ] Una libreria di supporto alle verifiche è installata ma mai attivata
-- [ ] Nelle prove sul browser vero i due moduli vengono distinti per posizione («il primo», «il secondo») invece che per nome: dando un nome a ciascun modulo, invertirli non romperebbe più niente
-- [ ] La configurazione delle prove sul browser va adattata per funzionare sul server di verifica automatica (avvio dell'app in versione definitiva, ripetizione in caso di fallimento, registrazione di cosa è successo)
-- [ ] Mancano il controllo automatico dello stile del codice e quello dei tipi
-- [ ] Manca la verifica automatica a ogni modifica (GitHub Actions)
-- [ ] Manca la protezione del ramo principale, che impedisce di inserire modifiche non verificate
-- [ ] Tutto questo lavoro esiste solo sul computer locale: il progetto pubblicato è ancora fermo alle prime due modifiche
