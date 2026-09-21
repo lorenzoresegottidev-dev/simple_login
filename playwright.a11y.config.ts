@@ -1,10 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests/e2e_tests',
-  forbidOnly: !!process.env.CI,
+  testDir: './tests/accessibility_tests',
   use: {
-    trace: 'on-first-retry',
     baseURL: 'http://127.0.0.1:3000',
     ...devices['Desktop Chrome'],
   },
@@ -14,5 +12,4 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
-  retries: process.env.CI ? 2 : 0,
 });

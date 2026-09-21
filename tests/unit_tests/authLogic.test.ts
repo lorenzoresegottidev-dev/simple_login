@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decideLogin, logoutDecision, decideRegistration, StoredUser } from '../src/lib/auth/authLogic';
+import { decideLogin, logoutDecision, decideRegistration, StoredUser } from '../../src/lib/auth/authLogic';
 
 const existingUser: StoredUser = {
   id: '1',
